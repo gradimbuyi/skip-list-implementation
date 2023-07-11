@@ -1,3 +1,5 @@
+package Examples;
+
 import java.util.TreeSet;
 
 class InterfacesExample implements Comparable<InterfacesExample> {
