@@ -3,12 +3,10 @@ import java.util.Iterator;
 public class SkipListSetIterator <T extends Comparable<T>> implements Iterator<T> {
     public SkipListSet<T> skipListSet;
     public SkipListSetItem<T> current;
-    public Integer height;
 
     public SkipListSetIterator(SkipListSet<T> skipListSet) {
         this.skipListSet = skipListSet;
         this.current = skipListSet.getHead();
-        this.height = 1;
     }
 
     @Override

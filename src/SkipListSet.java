@@ -7,9 +7,11 @@ import java.util.Random;
 public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     private SkipListSetItem <T> head;
     private SkipListSetItem <T> bottomHead;
-    private SkipListSetIterator <T> iterator;
-
+    private SkipListSetItem <T> bottomTail;
+    private Integer height;
     private Integer size;
+
+    private SkipListSetIterator <T> iterator;
     private Random random;
 
     public SkipListSet() {
@@ -18,32 +20,17 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
         random = new Random();
 
         size = 0;
-        head.level = 0;
-        iterator.height = 1;
+        head.level = 1;
+        height = 1;
         bottomHead = head;
-    }
-
-    private SkipListSet(SkipListSet<T> previous) {
-        head = new SkipListSetItem<>();
-        head.value = previous.head.value;
-
-        iterator = previous.iterator;
-        random = previous.random;
-        size = previous.size;
-        head.level = previous.head.level + 1;
-        bottomHead = previous.bottomHead;
-        previous.head.above = head;
-        head.below = previous.head;
-
-        iterator.height++;
     }
 
     private SkipListSetItem<T> search(T value) {
         SkipListSetItem<T> current = head;
 
         while(current.below != null) {
-            while(current.next != null && current.compareTo(value) <= 0) current = current.next;
             current = current.below;
+            while(current.next != null && current.compareTo(value) < 0) current = current.next;
         }
 
         return current;
@@ -52,7 +39,7 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     @Override
     public boolean contains(Object object) {
         SkipListSetItem<T> current = search((T) object);
-        return current.value.compareTo((T) object) == 0;
+        return current.compareTo((T) object) == 0;
     }
 
     @Override
@@ -62,7 +49,7 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        return new Object[size];
     }
 
     @Override
@@ -72,43 +59,83 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
 
     public void print() {
         SkipListSetItem<T> current = head;
-
         System.out.println("Size: " + size);
+        System.out.println("Height: " + height);
 
-        System.out.println(current.value);
-
-        while(current.next != null){
-            current = current.next;
+        while(current.below != null) {
+            System.out.println("Current Height: " + current.level);
             System.out.print(current.value + " ");
 
+            while (current.next != null) {
+                current = current.next;
+                System.out.print(current.value + " ");
+            }
+
+            current = current.below;
+            System.out.println();
         }
     }
 
-    private SkipListSetItem<T> addNewLevel(SkipListSetItem<T> newNode) {
-        SkipListSet<T> newLevel = new SkipListSet<>(this);
+    private void addNewLevel(SkipListSetItem<T> newNode, SkipListSetItem<T> currentHead, int numLevelToAdd) {
+        if(numLevelToAdd == 0) return;
 
-        newNode.above = new SkipListSetItem<>(newNode.value);
-        newNode.above.below = newNode;
+        for(int i = 0; i < numLevelToAdd; i++) {
+            newNode.above = new SkipListSetItem<>(newNode.value);
+            newNode.above.level = newNode.level + 1;
+            newNode.above.below = newNode;
 
-        head.above = new SkipListSetItem<>(head.value);
-        head.above.below = head;
+            if(height < newNode.above.level) {
+                currentHead.above = new SkipListSetItem<>(currentHead.value);
+                currentHead.above.level = currentHead.level + 1;
+                currentHead.above.below = currentHead;
 
-        return newNode.above;
+                currentHead.above.next = newNode.above;
+                newNode.above.previous = currentHead.above;
+
+                currentHead = currentHead.above;
+                height++;
+
+            } else {
+                SkipListSetItem<T> previous = newNode.previous;
+                while(previous.above == null) previous = previous.previous;
+
+                newNode.above.previous = previous.above;
+                newNode.above.next = previous.above.next;
+                previous.above.next = newNode.above;
+            }
+
+            newNode = newNode.above;
+        }
+
+        if(newNode.level == height) {
+            head.above = new SkipListSetItem<>(head.value);
+            head.above.below = head;
+            head.above.level = head.level + 1;
+            head = head.above;
+            height++;
+        }
+
     }
 
     @Override
     public boolean add(T value) {
         SkipListSet<T> newLevel;
-        SkipListSetItem<T> newNode;
+        SkipListSetItem<T> newNode = null;
         SkipListSetItem<T> current = search(value);
+
+        int numLevelToAdd = 0;
+
+        while(random.nextBoolean()) numLevelToAdd++;
 
         if(isEmpty()) {
             head.value = value;
+            head.above = new SkipListSetItem<>(value);
+            head.above.below = head;
+            head.above.level = head.level + 1;
+            head = head.above;
+
             size++;
-
-            newLevel = new SkipListSet<>(this);
-            head = newLevel.head;
-
+            height++;
             return true;
         }
 
@@ -120,6 +147,7 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
             newNode.next = head;
             head.previous = newNode;
             head = newNode;
+            addNewLevel(newNode, bottomHead, numLevelToAdd);
 
         } else if(current.compareTo(value) > 0) {
             newNode = new SkipListSetItem<>(value);
@@ -127,38 +155,34 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
             newNode.previous = current.previous;
             current.previous.next = newNode;
             current.previous = newNode;
-
-            System.out.println("hi");
+            addNewLevel(newNode, bottomHead, numLevelToAdd);
 
         } else if(current.compareTo(value) < 0) {
             newNode = new SkipListSetItem<>(value);
             newNode.previous = current;
-            newNode.next = current.next;
             current.next = newNode;
-
-            System.out.println("hola");
-
+            addNewLevel(newNode, bottomHead, numLevelToAdd);
         }
 
-        /*
-        while(random.nextBoolean()) {
-            assert newNode != null;
-            newNode = addNewLevel(newNode);
-        }
-
-         */
         size++;
         return true;
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(Object value) {
+        SkipListSetItem<T> current = search((T) value);
+
+        size--;
         return false;
     }
 
     @Override
-    public boolean containsAll(Collection<?> c) {
-        return false;
+    public boolean containsAll(Collection<?> collection) {
+        for(Object item : collection) {
+            if(!contains(item)) return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -168,7 +192,7 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(Collection<?> collection) {
         return false;
     }
 
@@ -209,12 +233,12 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
 
     @Override
     public T first() {
-        return head.value;
+        return bottomHead.value;
     }
 
     @Override
     public T last() {
-        return head.next.value;
+        return bottomTail.value;
     }
 
     @Override
@@ -228,7 +252,12 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     }
 
     public void reBalance() {
+        while(head.below.next == null) {
+            head = head.below;
+            head.above = null;
+            height--;
 
+            System.gc();
+        }
     }
-
 }
