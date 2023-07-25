@@ -8,10 +8,13 @@ public class SkipListSetItem <T extends Comparable<T>> {
     public Integer level;
 
     public SkipListSetItem() {
+        this.value = null;
+
         this.next = null;
         this.previous = null;
         this.above = null;
         this.below = null;
+        this.level = null;
     }
 
     public SkipListSetItem(T value) {

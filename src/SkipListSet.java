@@ -10,9 +10,8 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     private SkipListSetItem <T> bottomTail;
     private Integer height;
     private Integer size;
-
     private SkipListSetIterator <T> iterator;
-    private Random random;
+    private final Random random;
 
     public SkipListSet() {
         head = new SkipListSetItem<>();
@@ -30,7 +29,10 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
 
         while(current.below != null) {
             current = current.below;
-            while(current.next != null && current.compareTo(value) < 0) current = current.next;
+
+            while(current.next != null && current.compareTo(value) < 0) {
+                current = current.next;
+            }
         }
 
         return current;
@@ -60,50 +62,61 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     public void print() {
         SkipListSetItem<T> current = head;
         System.out.println("Size: " + size);
-        System.out.println("Height: " + height);
+        System.out.println("Height: " + height + "\n");
 
-        while(current.below != null) {
+        while(current != null) {
             System.out.println("Current Height: " + current.level);
             System.out.print(current.value + " ");
-
             while (current.next != null) {
                 current = current.next;
                 System.out.print(current.value + " ");
             }
-
+            while(current.previous != null) current = current.previous;
             current = current.below;
-            System.out.println();
+            System.out.println("\n");
         }
     }
 
     private void addNewLevel(SkipListSetItem<T> newNode, SkipListSetItem<T> currentHead, int numLevelToAdd) {
         if(numLevelToAdd == 0) return;
 
+        //System.out.println(newNode.value + " is added " + numLevelToAdd + " times");
+
         for(int i = 0; i < numLevelToAdd; i++) {
+
+            //System.out.println("Height: " + height + " NewNode Height: " + newNode.level);
+
             newNode.above = new SkipListSetItem<>(newNode.value);
             newNode.above.level = newNode.level + 1;
             newNode.above.below = newNode;
 
-            if(height < newNode.above.level) {
-                currentHead.above = new SkipListSetItem<>(currentHead.value);
+            if(height < newNode.level) {
+                currentHead.above = new SkipListSetItem<>(head.value);
                 currentHead.above.level = currentHead.level + 1;
                 currentHead.above.below = currentHead;
-
                 currentHead.above.next = newNode.above;
                 newNode.above.previous = currentHead.above;
 
-                currentHead = currentHead.above;
                 height++;
 
-            } else {
+            } else if(height > newNode.level) {
                 SkipListSetItem<T> previous = newNode.previous;
                 while(previous.above == null) previous = previous.previous;
-
                 newNode.above.previous = previous.above;
                 newNode.above.next = previous.above.next;
                 previous.above.next = newNode.above;
+
+            } else {
+                head.above = new SkipListSetItem<>(head.value);
+                head.above.below = head;
+                head.above.level = head.level + 1;
+                head.above.next = newNode.above;
+                newNode.above.previous = head.above;
+                head = head.above;
+                height++;
             }
 
+            currentHead = currentHead.above;
             newNode = newNode.above;
         }
 
@@ -115,11 +128,11 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
             height++;
         }
 
+       // System.out.println();
     }
 
     @Override
     public boolean add(T value) {
-        SkipListSet<T> newLevel;
         SkipListSetItem<T> newNode = null;
         SkipListSetItem<T> current = search(value);
 
@@ -147,7 +160,8 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
             newNode.next = head;
             head.previous = newNode;
             head = newNode;
-            addNewLevel(newNode, bottomHead, numLevelToAdd);
+
+            //addNewLevel(newNode, bottomHead, numLevelToAdd);
 
         } else if(current.compareTo(value) > 0) {
             newNode = new SkipListSetItem<>(value);
@@ -161,6 +175,7 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
             newNode = new SkipListSetItem<>(value);
             newNode.previous = current;
             current.next = newNode;
+            bottomTail = newNode;
             addNewLevel(newNode, bottomHead, numLevelToAdd);
         }
 
