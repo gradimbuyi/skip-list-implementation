@@ -1,8 +1,8 @@
 import java.util.Iterator;
 
 public class SkipListSetIterator <T extends Comparable<T>> implements Iterator<T> {
-    public SkipListSet<T> skipListSet;
-    public SkipListSetItem<T> current;
+    private SkipListSet<T> skipListSet;
+    private SkipListSetItem<T> current;
 
     public SkipListSetIterator(SkipListSet<T> skipListSet) {
         this.skipListSet = skipListSet;

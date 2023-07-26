@@ -1,6 +1,5 @@
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -228,7 +227,7 @@ public class SkipListTestHarness {
 
 		SkipListSet<Integer> integers = new SkipListSet<>();
 
-		Random random = new Random();
+		Random random = new Random(1);
 
 		integers.add(5);
 		integers.add(8);
@@ -237,12 +236,18 @@ public class SkipListTestHarness {
 		integers.add(6);
 		integers.add(20);
 		integers.add(100);
+		integers.add(89);
+		integers.add(15);
 
-		for(int i = 0; i < 1000; i++) {
+		for(int i = 0; i < 20; i++) {
 			integers.add(random.nextInt(6, 2000));
 		}
 
+		integers.add(103);
+		integers.add(2);
 		integers.print();
+
+
 
 /*
 		SkipListTestHarness.executeStringCase(100000, 10000, 1000, false, true);
