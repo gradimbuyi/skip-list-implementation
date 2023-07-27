@@ -246,8 +246,10 @@ public class SkipListTestHarness {
 		integers.add(103);
 		integers.add(2);
 		integers.print();
-
-
+		integers.remove(5);
+		integers.print();
+		integers.remove(822);
+		integers.print();
 
 /*
 		SkipListTestHarness.executeStringCase(100000, 10000, 1000, false, true);
