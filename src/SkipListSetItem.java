@@ -4,7 +4,6 @@
  * @since July 27, 2023
  * @param <T>
  */
-
 public class SkipListSetItem <T extends Comparable<T>> {
     public SkipListSetItem<T> next;
     public SkipListSetItem<T> above;

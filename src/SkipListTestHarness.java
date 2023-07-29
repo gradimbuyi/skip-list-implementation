@@ -224,34 +224,6 @@ public class SkipListTestHarness {
 	public SkipListTestHarness() {}
 	
 	public static void main(String args[]) {
-
-		SkipListSet<Integer> integers = new SkipListSet<>();
-
-		Random random = new Random(1);
-
-		integers.add(5);
-		integers.add(8);
-		integers.add(7);
-		integers.add(10);
-		integers.add(6);
-		integers.add(20);
-		integers.add(100);
-		integers.add(89);
-		integers.add(15);
-
-		for(int i = 0; i < 20; i++) {
-			integers.add(random.nextInt(6, 2000));
-		}
-
-		integers.add(103);
-		integers.add(2);
-		integers.print();
-		integers.remove(5);
-		integers.print();
-		integers.remove(822);
-		integers.print();
-
-/*
 		SkipListTestHarness.executeStringCase(100000, 10000, 1000, false, true);
 		System.gc();
 		SkipListTestHarness.executeStringCase(1000000, 10000, 1000, false, true);
@@ -274,10 +246,5 @@ public class SkipListTestHarness {
 		System.gc();
 		SkipListTestHarness.executeIntCase(10000000, 10000000, false, true);	
 		System.gc();
-
-
-
-
- */
 	}
 }
