@@ -24,7 +24,7 @@ public class SkipListSetIterator <T extends Comparable<T>> implements Iterator<T
      */
     @Override
     public boolean hasNext() {
-        return current.next != null;
+        return current.getNext() != null;
     }
 
     /**
@@ -33,8 +33,8 @@ public class SkipListSetIterator <T extends Comparable<T>> implements Iterator<T
      */
     @Override
     public T next() {
-        current = current.next;
-        return current.value;
+        current = current.getNext();
+        return current.getValue();
     }
 
     /**
@@ -42,7 +42,7 @@ public class SkipListSetIterator <T extends Comparable<T>> implements Iterator<T
      */
     @Override
     public void remove() {
-        skipListSet.remove(current.value);
+        skipListSet.remove(current.getValue());
     }
 
 }
