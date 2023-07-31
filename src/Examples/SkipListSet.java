@@ -180,14 +180,18 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     /* iterates through a given collection, adding each element to a skip list */
     @Override
     public boolean addAll(Collection<? extends T> collection) {
-        for(T item : collection) add(item);
+        for(T item : collection) {
+            add(item);
+        }
         return true;
     }
 
     /* iterates through a given collection, removing similar elements from a skip list */
     @Override
     public boolean removeAll(Collection<?> collection) {
-        for(Object item : collection) remove(item);
+        for(Object item : collection) {
+            remove(item);
+        }
         return true;
     }
 
@@ -390,8 +394,71 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
         return true;
     }
 
+    private void removeLevels(SkipListSetItem<T> current, int removeBy) {
+        for(int i = 0; i < removeBy; i++) {
+            current.above = null;
+            current.previous.next = current.next;
+
+            if(current.next != null) {
+                current.next.previous = current.previous;
+            }
+
+            current = current.below;
+        }
+    }
+
+    private SkipListSetItem<T> deleteSingleNode(SkipListSetItem<T> current) {
+        SkipListSetItem<T> next = current.next;
+
+        if(current.next != null) current.next.previous = current.previous;
+        if(current.below != null) current.below.above = null;
+        if(current.previous != null) current.previous.next = current.next;
+
+        current = null;
+
+        return next;
+    }
 
     public void reBalance() {
-        ;
+        int levelValue, nodePosition = 0;
+        int maxLevel = (int) (Math.log(size) / Math.log(2));
+
+        SkipListSetItem<T> current = bottomHead;
+        SkipListSetItem<T> currentTop;
+
+        if(height > maxLevel) {
+            nodePosition++;
+            currentTop = head;
+
+            for(int i = 0; i < height - maxLevel; i++) {
+                SkipListSetItem<T> next = currentTop.next;
+                while(next != null) {
+                    next = deleteSingleNode(next);
+                }
+                currentTop = currentTop.below;
+                currentTop.above = null;
+            }
+            head = currentTop;
+            current = current.next;
+        }
+
+        while(current != null) {
+            nodePosition++;
+
+            levelValue = 0;
+            currentTop = current;
+
+            while(currentTop.above != null) {
+                currentTop = currentTop.above;
+            }
+
+            if(currentTop.level < levelValue) {
+                addNewLevel(current, levelValue);
+            } else if(currentTop.level > levelValue) {
+                removeLevels(currentTop, levelValue);
+            }
+
+            current = current.next;
+        }
     }
 }
