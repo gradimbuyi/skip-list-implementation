@@ -5,11 +5,11 @@ Read more about the thought process behind this implementation: [Project Progres
 
 ## Compiling the Program
 ```
-$ javac ./src/SkipList/SkipListSet.java
+$ javac ./src/SkipListTestHarness.java
 ```
 ## Executing the Program
 ```
-$ java ./SkipListSet
+$ java ./SkipListTestHarness
 ```
 ### Relevant Methods
 ---
