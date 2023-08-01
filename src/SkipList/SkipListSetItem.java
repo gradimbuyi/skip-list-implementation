@@ -1,3 +1,5 @@
+package SkipList;
+
 /**
  * This class provides the SkipList Set with data elements. Each instance of the SkipListSetItem class
  * store the data value of the element, as well as the location of it neighbor.
@@ -102,35 +104,51 @@ public class SkipListSetItem <T extends Comparable<T>> {
         return level;
     }
 
-    /** Setter method for setting the next element of a given skip list item. */
+    /**
+     * Setter method for setting the next element of a given skip list item.
+     * @param next memory location of next element.
+     */
     public void setNext(SkipListSetItem<T> next) {
         this.next = next;
     }
 
-    /** Setter method for setting the above element of a given skip list item. */
+    /**
+     * Setter method for setting the above element of a given skip list item.
+     * @param above memory location of above element.
+     */
     public void setAbove(SkipListSetItem<T> above) {
         this.above = above;
     }
 
-    /** Setter method for setting the bellow element of a given skip list item. */
+    /**
+     * Setter method for setting the bellow element of a given skip list item.
+     * @param below memory location of below element.
+     */
     public void setBelow(SkipListSetItem<T> below) {
         this.below = below;
     }
 
-    /** Setter method for setting the previous element of a given skip list item. */
+    /**
+     * Setter method for setting the previous element of a given skip list item.
+     * @param previous memory location of previous element.
+     */
     public void setPrevious(SkipListSetItem<T> previous) {
         this.previous = previous;
     }
 
-    /** Setter method for setting the value of a given skip list item. */
+    /**
+     * Setter method for setting the value of a given skip list item.
+     * @param value memory location of value.
+     */
     public void setValue(T value) {
         this.value = value;
     }
 
-    /** Setter method for setting the level of a given skip list item. */
+    /**
+     * Setter method for setting the level of a given skip list item.
+     * @param level memory location of level.
+     */
     public void setLevel(Integer level) {
         this.level = level;
     }
-
-
 }

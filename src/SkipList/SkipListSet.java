@@ -1,3 +1,5 @@
+package SkipList;
+
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.Random;
@@ -19,7 +21,7 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     private SkipListSetItem <T> bottomTail;
     private Integer height;
     private Integer size;
-    private final Random random;
+    private Random random;
 
     /**
      * Default constructor to initialize a skip list. This constructor does not accept any parameters, however as we
@@ -29,13 +31,17 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     public SkipListSet() {
         head = new SkipListSetItem<>();
         random = new Random(1);
-
         size = 0;
         head.setLevel(1);
         height = 1;
         bottomHead = head;
     }
 
+    /**
+     * Secondary constructor to initialize a skip list. This constructor accepts a collection as a parameter,
+     * retrieving each of its values and adding them to the skip list.
+     * @param collection collection whose value is to be stored in a skip list set.
+     */
     public SkipListSet(Collection<? extends T> collection) {
         head = new SkipListSetItem<>();
         random = new Random(1);
@@ -50,7 +56,6 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
      * This method creates and returns an instance of the SkipListSetIterator class. Through the SkipListSetIterator
      * object, we can check to see if a list has a next value. If a value is present, we can retrieve and remove it
      * from the skip list.
-     *
      * @return Returns a new instance of the SkipListSetIterator class.
      */
     @Override
@@ -84,10 +89,9 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
         return bottomHead;
     }
 
-
     /**
-     *
-     * @return Returns the cardinality of a skip list
+     * Getter method to retrieve the size of a skip list.
+     * @return Returns the size (cardinality) of a skip list.
      */
     @Override
     public int size() {
@@ -95,8 +99,8 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     }
 
     /**
-     *
-     * @return
+     * This method is used check if a skip list is empty - returning true if this the case, otherwise returns false.
+     * @return Returns true if the skip list has no element, otherwise return false
      */
     @Override
     public boolean isEmpty() {
@@ -138,7 +142,7 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     }
 
     /**
-     *
+     * This method is unsupported per Project instructions
      * @return Returns null
      */
     @Override
@@ -149,7 +153,6 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     /**
      * This method checks to see if a given object or value is contained within a skip list. It calls the search()
      * method, returning true if the value is present in the list, or false if the value isn't present in the list.
-     *
      * @param object element whose presence in this set is to be tested.
      * @return Returns true if element is present in the set, otherwise returns false.
      */
@@ -164,7 +167,6 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
      * contains() method n times, where n represents the number of value within the given collection, returning false
      * if a specific element isn't present in the list, or otherwise returning true. The performance of this operation
      * isn't ideal given the fact that collections are not always sorted.
-     *
      * @param collection collection to be checked for containment in this set.
      * @return Returns true if all elements in collection is contained in the skip list.
      */
@@ -176,9 +178,7 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
         return true;
     }
 
-    /**
-     * This method is used to clear the skip list. Each value is reset to its original state.
-     */
+    /** This method is used to clear the skip list. Each value is reset to its original state. */
     @Override
     public void clear() {
         head = new SkipListSetItem<>();
@@ -194,7 +194,6 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
      * This method perform search operations. Given a specified value, search() attempts to find the closet value
      * less than or equal to the given object. It's important to note that this is an internal method, meaning
      * that it isn't accessible beyond the scope of the SkipListSet class.
-     *
      * @param value element whose presence in this set is to be tested.
      * @return Returns the location of the closest element to the given value.
      */
@@ -214,7 +213,6 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     /**
      * This method is used to add elements of a given collections to a skip list, utilizing the add() method to perform
      * this operation.
-     *
      * @param collection collection containing elements to be added to this set.
      * @return Returns true once each element is added to the list.
      */
@@ -229,9 +227,8 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     /**
      * This method is used to remove elements of a given collections from a skip list, utilizing the remove() method
      * to perform this operation.
-     *
      * @param collection collection containing elements to be removed from this set
-     * @return
+     * @return Always returns true after completion of removal.
      */
     @Override
     public boolean removeAll(Collection<?> collection) {
@@ -242,13 +239,32 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     }
 
     /**
-     *
+     * This method is used to retain similar elements between a collection and a skip list. All the elements that are
+     * present in the skip list but aren't present in the collection are removed.
      * @param collection collection containing elements to be retained in this set
-     * @return
+     * @return Always returns true after completion of the retaining operations.
      */
     @Override
     public boolean retainAll(Collection<?> collection) {
-        return false;
+        SkipListSetItem<T> current = bottomHead;
+        SkipListSet<T> newSkipList = new SkipListSet<>();
+
+        for(int i = 0; i < size; i++) {
+            if(collection.contains(current.getValue())) {
+                newSkipList.add(current.getValue());
+            }
+        }
+
+        head = newSkipList.head;
+        bottomHead = newSkipList.bottomHead;
+        size = newSkipList.size;
+        bottomTail = newSkipList.bottomTail;
+        random = newSkipList.random;
+        height = newSkipList.height;
+
+        System.gc();
+
+        return true;
     }
 
     /**
@@ -269,9 +285,29 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
         return object;
     }
 
+    /**
+     * This method allocates space for an array with a size of SkipListSet.size. As we iterate over the entire
+     * skip list, each element is stored within the array. The array is then returned to the user.
+     * @param array the array into which the elements of this set are to be stored, if it is big enough;
+     * otherwise, a new array of the same runtime type is allocated for this purpose.
+     * @return Returns an array containing every element within a skip list.
+     * @param <T1> the method accepts generics types
+     */
     @Override
-    public <T1> T1[] toArray(T1[] a) {
-        return null;
+    public <T1> T1[] toArray(T1[] array) {
+        for(T1 value : array) {
+            add((T) value);
+        }
+
+        T1[] newArray = (T1[]) new Object[size];
+        SkipListSetItem<T> current = bottomHead;
+
+        for(int i = 0; i < size; i++) {
+            newArray[i] = (T1) current.getValue();
+            current = current.getNext();
+        }
+
+        return newArray;
     }
 
     /**
@@ -355,7 +391,6 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
      * This method adds specified element in a skip list, depending on whether the element is already contained in
      * the list. This method does not allow duplicates. Before performing the add operation, add() calls search() and
      * checks to see if the element is within the list.
-     *
      * @param value element whose presence in this collection is to be ensured.
      * @return Returns true if value is successfully added to the skip list, and false if value is already in the list.
      */
@@ -405,7 +440,8 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
     }
 
     /**
-     *
+     * This method removes specified element in a skip list, depending on whether the element is contained in
+     * the list. If the value is present, it is removed and the method returns true, otherwise the method returns false.
      * @param value object to be removed from this set, if present.
      * @return Returns true if element is successfully removed, otherwise returns false.
      */
@@ -440,19 +476,12 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
         return true;
     }
 
-    private void removeLevels(SkipListSetItem<T> current, int removeBy) {
-        for(int i = 0; i < removeBy; i++) {
-            current.setAbove(null);
-            current.getPrevious().setNext(current.getNext());
-
-            if(current.getNext() != null) {
-                current.getNext().setPrevious(current.getPrevious());
-            }
-
-            current = current.getBelow();
-        }
-    }
-
+    /**
+     * This method remove single node from the skip. This differs from the remove method because during its operation,
+     * the method removes the element from single level, rather than removing the element all together.
+     * @param current node to be removed from the list
+     * @return Returns the next node from the one removed from the list.
+     */
     private SkipListSetItem<T> deleteSingleNode(SkipListSetItem<T> current) {
        SkipListSetItem<T> next = current.getNext();
 
@@ -465,53 +494,42 @@ public class SkipListSet <T extends  Comparable<T>> implements SortedSet<T> {
         return next;
     }
 
-    private void reduceHeadLevel(SkipListSetItem<T> currentTop, int reduceBy) {
-        for(int i = 0; i < reduceBy; i++) {
-            SkipListSetItem<T> next = currentTop.getNext();
-            while(next != null) {
-                next = deleteSingleNode(next);
-            }
-            currentTop = currentTop.getBelow();
-            currentTop.setAbove(null);
-        }
-        head = currentTop;
-    }
-
-    private void increaseHeadLevel(SkipListSetItem<T> currentTop, int increaseBy) {
-
-    }
-
+    /**
+     * Method to balance the skip list to improve the performance of the search operations - it's important to
+     * note that this method does not achieve this successfully.
+     */
     public void reBalance() {
         int levelValue, nodePosition = 0;
         int maxLevel = (int) (Math.log(size) / Math.log(2));
 
-        SkipListSetItem<T> current = bottomHead.getNext();
-        SkipListSetItem<T> currentTop = head;
-
-        nodePosition++;
+        SkipListSetItem<T> current = bottomHead;
+        SkipListSetItem<T> currentTop;
 
         if(height > maxLevel) {
-            reduceHeadLevel(currentTop, height - maxLevel);
-
-        } else if (height != maxLevel) {
-            increaseHeadLevel(currentTop, maxLevel - height);
+            nodePosition++;
+            currentTop = head;
+            for(int i = 0; i < height - maxLevel; i++) {
+                SkipListSetItem<T> next = currentTop.getNext();
+                while(next != null) {
+                    next = deleteSingleNode(next);
+                }
+                currentTop = currentTop.getBelow();
+                currentTop.setAbove(null);
+            }
+            head = currentTop;
+            current = current.getNext();
         }
 
         while(current != null) {
             nodePosition++;
+            levelValue = (int) (maxLevel - (Math.log(nodePosition) / Math.log(2)));
             currentTop = current;
-            levelValue = 0;
-
             while(currentTop.getAbove() != null) {
                 currentTop = currentTop.getAbove();
             }
-
             if(currentTop.getLevel() < levelValue) {
                 addNewLevel(current, levelValue);
-            } else if(currentTop.getLevel() > levelValue) {
-                removeLevels(currentTop, levelValue);
             }
-
             current = current.getNext();
         }
     }

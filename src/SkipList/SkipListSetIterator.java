@@ -1,3 +1,5 @@
+package SkipList;
+
 import java.util.Iterator;
 /**
  * This class is used to aid with skip list iteration. Given a skip list set, an instance of the
@@ -6,7 +8,7 @@ import java.util.Iterator;
  * @author Gradi Tshielekeja Mbuyi
  * @version 1.0
  * @since July 27, 2023
- * @param <T>
+ * @param <T> accepts generics as parameters.
  */
 public class SkipListSetIterator <T extends Comparable<T>> implements Iterator<T> {
     private SkipListSet<T> skipListSet;
